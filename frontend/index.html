@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Sudheer Study Centre</title>
+
+  <!-- Google Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+  <style>
+    body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9fafb;
+  color: #333;
+}
+
+.main-heading {
+  background-color: #4b0082;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: bold;
+}
+
+
+.navbar {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  background-color: #eee;
+  padding: 15px 10px;
+  flex-wrap: wrap;
+}
+
+.navbar a {
+  background-color: #4b0082;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.3s ease;
+  text-align: center;
+}
+
+.navbar a:hover,
+.navbar a.active {
+  background-color: #9370db;
+}
+
+h1 {
+  text-align: center;
+  margin: 25px 0 10px;
+  color: #1571cc;
+}
+
+.flashcards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 30px 20px;
+}
+
+.card {
+  position: relative;
+  background: linear-gradient(135deg, #f6f0ff, #e0d4ff);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  width: 260px;
+  height: 160px;
+  text-align: center;
+  padding: 25px 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.card .material-icons {
+  font-size: 40px;
+  color: #4b0082;
+  margin-bottom: 10px;
+}
+
+.card h3 {
+  margin: 5px 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.card p {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #222;
+}
+
+/* Responsive: Tablets and below */
+@media (max-width: 992px) {
+  .navbar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .flashcards {
+    padding: 20px 10px;
+    gap: 15px;
+  }
+
+  .card {
+    width: 220px;
+    height: 150px;
+    padding: 20px 15px;
+  }
+}
+
+/* Responsive: Mobile devices */
+@media (max-width: 600px) {
+  .main-heading {
+    font-size: 1.6rem;
+    padding: 15px;
+  }
+
+  .navbar {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .flashcards {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 10px;
+  }
+
+  .card {
+    width: 90%;
+    max-width: 320px;
+    height: auto;
+    padding: 20px 15px;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+  }
+
+  .card p {
+    font-size: 1.4rem;
+  }
+
+  .card .material-icons {
+    font-size: 36px;
+  }
+}
+
+  </style>
+</head>
+
+<body>
+
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background-color: #4b0082; color: white;">
+  <div class="main-heading">
+    Sudheer Study Centre
+  </div>
+
+  <div class="profile-dropdown" style="position: relative;">
+    <img src="https://ui-avatars.com/api/?name=SS&background=ffffff&color=000000&rounded=true&size=40" alt="Profile" class="profile-icon" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
+
+    <div class="profile-menu" style="display: none; position: absolute; right: 0; background: white; color: black; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; margin-top: 8px; min-width: 100px; z-index: 100;">
+      <a href="#" id="logoutBtn" style="display: block; padding: 8px; text-decoration: none; color: #4b0082;">Logout</a>
+    </div>
+  </div>
+</header>
+
+
+  
+  <div class="navbar">
+    <a href="index.html" class="active">Dashboard</a>
+    <a href="students.html">Students</a>
+    <a href="fees.html">Fees</a>
+    <a href="report.html">Reports</a>
+  </div>
+
+  <h1>Dashboard</h1>
+
+  <div class="flashcards">
+    <div class="card" onclick="goTo('students.html')">
+      <span class="material-icons">groups</span>
+      <h3>Total Students</h3>
+      <p id="totalStudents">--</p>
+    </div>
+
+    <div class="card" onclick="goTo('fees.html')">
+      <span class="material-icons">pending_actions</span>
+      <h3>Pending Fees</h3>
+      <p id="pendingFees">--</p>
+    </div>
+
+    <div class="card" onclick="goTo('report.html')">
+      <span class="material-icons">paid</span>
+      <h3>Fees Collected</h3>
+      <p id="feesCollected">--</p>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api/students';
+
+async function updateDashboardCards() {
+  try {
+    const res = await fetch(API_URL);
+    const students = await res.json();
+
+    const now = new Date();
+    const monthNumber = now.getMonth() + 1; // 1-12
+    const year = now.getFullYear().toString();
+
+    let totalCollected = 0;
+    let totalPending = 0;
+
+    students.forEach(s => {
+      const monthlyFee = s.fee || 0;
+      const paid = s.feesPaid?.[year]?.[monthNumber]?.paid === true;
+
+      if (paid) {
+        totalCollected += monthlyFee;
+      } else {
+        totalPending += monthlyFee;
+      }
+    });
+
+    document.getElementById('feesCollected').textContent = `₹${totalCollected}`;
+    document.getElementById('pendingFees').textContent = `₹${totalPending}`;
+  } catch (error) {
+    console.error('Error loading dashboard data:', error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetch('http://localhost:5000/api/students/count')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('totalStudents').textContent = data.count;
+    })
+    .catch(err => {
+      console.error("Failed to fetch student count:", err);
+    });
+});
+
+
+  const profileIcon = document.querySelector('.profile-icon');
+  const profileMenu = document.querySelector('.profile-menu');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  // Show/hide profile menu when profile icon clicked
+  profileIcon.addEventListener('click', () => {
+    profileMenu.style.display = profileMenu.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // Logout and redirect to login.html
+  logoutBtn.addEventListener('click', (e) => {
+    e.preventDefault(); // prevent default anchor behavior
+    window.location.href = "login.html";
+  });
+
+  // Optional: Hide menu if clicked outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.profile-dropdown')) {
+      profileMenu.style.display = 'none';
+    }
+  });
+
+
+
+
+updateDashboardCards();
+
+    function goTo(page) {
+      window.location.href = page;
+    }
+  </script>
+</body>
+</html>

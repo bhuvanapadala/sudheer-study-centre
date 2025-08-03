@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fees - Sudheer Study Centre</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9fafb;
+      color: #333;
+    }
+
+    .main-heading {
+      background-color: #4b0082;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 2.2rem;
+      font-weight: bold;
+    }
+
+
+    .navbar {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      background-color: #eee;
+      padding: 15px 10px;
+      flex-wrap: wrap;
+    }
+
+    .navbar a {
+      background-color: #4b0082;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .navbar a:hover,
+    .navbar a.active {
+      background-color: #9370db;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 20px;
+      color: #1571cc;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .filters input,
+    .filters select {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .student-card {
+      background: white;
+      margin: 20px auto;
+      max-width: 900px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .student-card h3 {
+      margin-top: 0;
+      color: #4b0082;
+    }
+
+    .fees-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .fees-grid button {
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .paid {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .unpaid {
+      background-color: #ccc;
+      color: #000;
+    }
+
+    .save-btn {
+      margin-top: 15px;
+      background-color: #2b2e4a;
+      color: white;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .save-btn:hover {
+      background-color: #3e3f5e;
+    }
+
+    .no-results {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 18px;
+      color: #aaa;
+    }
+
+    @media (max-width: 768px) {
+      .fees-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background-color: #4b0082; color: white;">
+  <div class="main-heading">
+    Sudheer Study Centre
+  </div>
+
+  <div class="profile-dropdown" style="position: relative;">
+    <img src="https://ui-avatars.com/api/?name=SS&background=ffffff&color=000000&rounded=true&size=40" alt="Profile" class="profile-icon" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
+
+    <div class="profile-menu" style="display: none; position: absolute; right: 0; background: white; color: black; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; margin-top: 8px; min-width: 100px; z-index: 100;">
+      <a href="#" id="logoutBtn" style="display: block; padding: 8px; text-decoration: none; color: #4b0082;">Logout</a>
+    </div>
+  </div>
+</header>
+
+  <div class="navbar">
+    <a href="index.html">Dashboard</a>
+    <a href="students.html">Students</a>
+    <a href="fees.html" class="active">Fees</a>
+    <a href="report.html">Reports</a>
+  </div>
+
+  <h1>Fees Management</h1>
+
+  <div class="filters">
+    <input type="text" id="searchName" placeholder="Search by Name">
+    <select id="filterSchool">
+      <option value="">All Schools</option>
+      <option>Sudheer Kids School</option>
+      <option>Sudheer EM School</option>
+      <option>Pragati Vidya Niketan</option>
+      <option>Government School</option>
+      <option>Minerva EM School</option>
+      <option>Aditya EM School</option>
+      <option>St.Ann's School</option>
+      <option>Sri Shirdi Sai Vidya Niketan</option>
+      <option>Dafne</option>
+      <option>Rajamahendri International School</option>
+      <option>Delhi Public School</option>
+      <option>Future Kids School</option>
+      <option>Dreams School</option>
+      <option>SR School</option>
+      <option>Other</option>
+    </select>
+    <select id="filterPlace">
+      <option value="">All Places</option>
+      <option>Kadiyapulanka</option>
+      <option>Burrilanka</option>
+    </select>
+    <select id="filterYear">
+      <!-- Years 2023 to 2030 -->
+    </select>
+  </div>
+
+  <div id="studentsContainer"></div>
+  <p class="no-results" id="noResults" style="display: none;">No students found.</p>
+
+  <script>
+  const API_URL = "http://localhost:5000/api/students";
+  const container = document.getElementById("studentsContainer");
+  const currentYear = new Date().getFullYear();
+  const filterYear = document.getElementById("filterYear");
+
+  for (let y = 2023; y <= 2030; y++) {
+    const option = document.createElement("option");
+    option.value = y;
+    option.textContent = y;
+    if (y === currentYear) option.selected = true;
+    filterYear.appendChild(option);
+  }
+
+  let students = [];
+
+  async function fetchStudents() {
+    try {
+      const res = await fetch(API_URL);
+      students = await res.json();
+      renderStudents();
+    } catch (err) {
+      console.error("Error fetching students:", err);
+    }
+  }
+
+  function renderStudents() {
+    container.innerHTML = "";
+    const name = document.getElementById("searchName").value.toLowerCase();
+    const school = document.getElementById("filterSchool").value;
+    const place = document.getElementById("filterPlace").value;
+    const year = document.getElementById("filterYear").value;
+
+    const filtered = students.filter(s =>
+      s.name.toLowerCase().includes(name) &&
+      (!school || s.school === school) &&
+      (!place || s.place === place)
+    );
+
+    document.getElementById("noResults").style.display = filtered.length ? "none" : "block";
+
+    filtered.forEach(s => {
+      const div = document.createElement("div");
+      div.className = "student-card";
+
+      div.innerHTML = `
+        <h3>${s.name}</h3>
+        <p><strong>Class:</strong> ${s.class} | <strong>School:</strong> ${s.school} | <strong>Place:</strong> ${s.place}</p>
+        <div class="fees-grid" id="fees-${s._id}"></div>
+        <button class="save-btn" onclick="saveFees('${s._id}')">💾 Save</button>
+      `;
+
+      container.appendChild(div);
+
+      const grid = div.querySelector(`#fees-${s._id}`);
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+      // Setup feesPaid object if not present
+      if (!s.feesPaid) s.feesPaid = {};
+      if (!s.feesPaid[year]) s.feesPaid[year] = {};
+
+      months.forEach((month, index) => {
+        const paid = s.feesPaid?.[year]?.[index + 1]?.paid || false;
+        const btn = document.createElement("button");
+        btn.textContent = month;
+
+        btn.className = paid ? "paid" : "unpaid";
+
+        btn.onclick = () => {
+  const newPaidStatus = !paid;
+  btn.textContent = newPaidStatus ? "Paid" : "Unpaid";
+
+
+  // Update local data
+  if (!s.feesPaid[year]) s.feesPaid[year] = {};
+  s.feesPaid[year][index + 1] = {
+    paid: newPaidStatus,
+    date: new Date().toISOString().split("T")[0]
+  };
+
+  // Update button UI only
+  btn.classList.remove("paid", "unpaid");
+  btn.classList.add(newPaidStatus ? "paid" : "unpaid");
+};
+
+
+        grid.appendChild(btn);
+      });
+    });
+  }
+
+  async function saveFees(id) {
+    const student = students.find(s => s._id === id);
+    if (!student) return;
+
+    try {
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ feesPaid: student.feesPaid })
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        alert("Fees saved successfully ✅");
+      } else {
+        console.error(result);
+        alert("Save failed ❌");
+      }
+    } catch (err) {
+      console.error("Error saving fees:", err);
+      alert("Server error ❌");
+    }
+  }
+
+  
+
+  document.getElementById("searchName").addEventListener("input", renderStudents);
+  document.getElementById("filterSchool").addEventListener("change", renderStudents);
+  document.getElementById("filterPlace").addEventListener("change", renderStudents);
+  document.getElementById("filterYear").addEventListener("change", renderStudents);
+  
+  
+  const profileIcon = document.querySelector('.profile-icon');
+  const profileMenu = document.querySelector('.profile-menu');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  // Show/hide profile menu when profile icon clicked
+  profileIcon.addEventListener('click', () => {
+    profileMenu.style.display = profileMenu.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // Logout and redirect to login.html
+  logoutBtn.addEventListener('click', (e) => {
+    e.preventDefault(); // prevent default anchor behavior
+    window.location.href = "login.html";
+  });
+
+  // Optional: Hide menu if clicked outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.profile-dropdown')) {
+      profileMenu.style.display = 'none';
+    }
+  });
+
+
+  fetchStudents();
+</script>
+
+</body>
+</html>
