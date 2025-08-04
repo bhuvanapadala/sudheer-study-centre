@@ -113,6 +113,7 @@
 
 
   <script>
+
     function login() {
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
@@ -121,10 +122,13 @@
       // Set your credentials here
       const validUsername = "ssc";
       const validPassword = "study123";
+      
+
+ // Dashboard or main page ki redirect
 
       if (username === validUsername && password === validPassword) {
-        // Redirect to dashboard
-        window.location.href = "index.html";
+        localStorage.setItem('loggedIn', 'true');
+window.location.href = 'index.html'; 
       } else {
         errorMsg.textContent = "Invalid username or password!";
       }

@@ -11,8 +11,11 @@ const {
   updateStudent,
   deleteStudent,
   getFeeReport,
-  updateFeeStatus
+  updateFeeStatus,
+  login
 } = require('../controllers/studentController');
+
+router.post('/login', login); 
 
 const Student = require('../models/Student');
 

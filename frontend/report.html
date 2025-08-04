@@ -260,6 +260,12 @@
 
   <script>
   const API_URL = 'https://elsa-backend.onrender.com/api/students';
+  if (localStorage.getItem('loggedIn') !== 'true') {
+    window.location.href = 'login.html';
+  }
+
+
+
   const selectedYear = document.getElementById('filterYear').value;
 
   let students = [];
@@ -350,9 +356,11 @@ const paid = s.feesPaid?.[selectedYear]?.[monthNumber]?.paid === true;
 
   // Logout and redirect to login.html
   logoutBtn.addEventListener('click', (e) => {
-    e.preventDefault(); // prevent default anchor behavior
-    window.location.href = "login.html";
-  });
+  e.preventDefault();
+  localStorage.removeItem('loggedIn'); 
+  window.location.href = "login.html";
+});
+
 
   // Optional: Hide menu if clicked outside
   document.addEventListener('click', (e) => {

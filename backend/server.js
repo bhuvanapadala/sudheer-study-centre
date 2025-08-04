@@ -8,6 +8,7 @@ const listEndpoints = require('express-list-endpoints');
 const connectDB = require('./config/db');
 const studentRoutes = require('./routes/studentRoutes');
 
+
 dotenv.config();
 connectDB();
 
@@ -16,6 +17,8 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+
 
 // Root route
 app.get('/', (req, res) => {

@@ -181,6 +181,35 @@ const getFeeReport = async (req, res) => {
   }
 };
 
+const jwt = require('jsonwebtoken');
+
+// POST /api/login
+const login = async (req, res) => {
+  try {
+    const { mobile } = req.body;
+
+    // Check if student exists
+    const user = await Student.findOne({ mobile });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid mobile number' });
+    }
+
+    // Create token
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      user
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Login failed', error });
+  }
+};
+
+
+
+
 
 
 // Export all functions
@@ -193,5 +222,6 @@ module.exports = {
   updateStudent,
   deleteStudent,
   getFeeReport,
-  updateFeeStatus
+  updateFeeStatus,
+  login
 };

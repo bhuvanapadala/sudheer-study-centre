@@ -54,17 +54,25 @@
     .filters {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 20px;
+      gap: 15px;
+      align-items: center;
+      margin: 20px auto;
+      padding: 10px;
+      background-color: #f0f4f8;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      max-width: 900px;
     }
 
     .filters input,
     .filters select {
-      padding: 10px;
-      border-radius: 8px;
+      padding: 10px 15px;
+      font-size: 16px;
       border: 1px solid #ccc;
-      font-size: 14px;
+      border-radius: 8px;
+      flex: 1;
+      min-width: 150px;
+      max-width: 250px;
     }
 
     .student-card {
@@ -193,6 +201,12 @@
 
   <script>
   const API_URL = "https://elsa-backend.onrender.com/api/students";
+  
+  if (localStorage.getItem('loggedIn') !== 'true') {
+    window.location.href = 'login.html';
+  }
+  
+
   const container = document.getElementById("studentsContainer");
   const currentYear = new Date().getFullYear();
   const filterYear = document.getElementById("filterYear");
@@ -325,9 +339,11 @@
 
   // Logout and redirect to login.html
   logoutBtn.addEventListener('click', (e) => {
-    e.preventDefault(); // prevent default anchor behavior
-    window.location.href = "login.html";
-  });
+  e.preventDefault();
+  localStorage.removeItem('loggedIn');  // Clear login flag on logout
+  window.location.href = "login.html";
+});
+
 
   // Optional: Hide menu if clicked outside
   document.addEventListener('click', (e) => {
@@ -335,6 +351,8 @@
       profileMenu.style.display = 'none';
     }
   });
+
+  
 
 
   fetchStudents();
