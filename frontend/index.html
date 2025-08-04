@@ -218,7 +218,7 @@ h1 {
   </div>
 
   <script>
-    const API_URL = 'https://elsa-backend.onrender.com';
+    const API_URL = 'https://elsa-backend.onrender.com/api/students';
 
 async function updateDashboardCards() {
   try {
@@ -251,7 +251,7 @@ async function updateDashboardCards() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  fetch('http://localhost:5000/api/students/count')
+  fetch('https://elsa-backend.onrender.com/api/students/count')
     .then(res => res.json())
     .then(data => {
       document.getElementById('totalStudents').textContent = data.count;
