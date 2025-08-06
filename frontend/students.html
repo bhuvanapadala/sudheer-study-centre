@@ -53,7 +53,7 @@
 
 
     .container {
-      max-width: 900px;
+      max-width: 1200px;
       margin: 30px auto;
       padding: 20px;
       background: white;
@@ -137,7 +137,7 @@
       padding: 30px;
       border-radius: 10px;
       width: 90%;
-      max-width: 400px;
+      max-width: 900px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
@@ -315,6 +315,21 @@
   }
 }
 
+.footer {
+  text-align: center;
+  padding: 15px;
+  background-color: #f8f8f8;
+  color: #333;
+  font-size: 14px;
+  margin-top: 40px;
+  border-top: 1px solid #ddd;
+}
+
+.footer p {
+  margin: 0;
+}
+
+
   </style>
 </head>
 <body>
@@ -367,6 +382,13 @@
     <option>Kadiyapulanka</option>
     <option>Burrilanka</option>
   </select>
+
+  <select id="filterStatus">
+  <option value="">All Status</option>
+  <option value="Active">Active</option>
+  <option value="Inactive">Inactive</option>
+</select>
+
 </div>
 
 
@@ -382,6 +404,8 @@
           <th>School</th>
           <th>Mobile</th>
           <th>Monthly Fee</th>
+          <th>Status</th>
+          <th>Pending</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -442,6 +466,17 @@
         <option>500</option>
         <option>600</option>
       </select>
+      
+<select id="status">
+  <option value="">Student Status</option>
+  <option value="Active">Active</option>
+  <option value="Inactive">Inactive</option>
+</select>
+
+
+<input type="number" id="pendingAmount" placeholder="₹pendingamount" />
+
+
       </div>
       <button class="btn" id="saveBtn" onclick="saveStudent()">Save</button>
       <button class="btn" id="cancelBtn" onclick="closeModal()">Cancel</button>
@@ -458,14 +493,17 @@
     </div>
   </div>
 
+  <footer class="footer">
+  <p>&copy; 2025 Sudheer Study Centre. All rights reserved. | Designed by Bhuvana Padala</p>
+</footer>
+
   
 <script>
   const API_URL = 'https://elsa-backend.onrender.com/api/students';
+
   if (localStorage.getItem('loggedIn') !== 'true') {
     window.location.href = 'login.html';
   }
-
-  
 
   const name = document.getElementById("name");
   const mobile = document.getElementById("mobile");
@@ -474,9 +512,14 @@
   const school = document.getElementById("school");
   const place = document.getElementById("place");
   const fee = document.getElementById("fee");
+  const status = document.getElementById("status"); 
+  const pendingAmount = document.getElementById("pendingAmount"); 
+
   const searchInput = document.getElementById("searchInput");
   const filterSchool = document.getElementById("filterSchool");
   const filterPlace = document.getElementById("filterPlace");
+  const filterStatus = document.getElementById("filterStatus");
+
   const noResults = document.getElementById("noResults");
 
   let students = [];
@@ -494,11 +537,12 @@
     const schoolFilter = filterSchool.value;
     const placeFilter = filterPlace.value;
 
-    const filtered = students.filter(s => (
+    const filtered = students.filter(s =>
       s.name.toLowerCase().includes(search) &&
       (schoolFilter === '' || s.school === schoolFilter) &&
-      (placeFilter === '' || s.place === placeFilter)
-    ));
+      (placeFilter === '' || s.place === placeFilter) &&
+      (filterStatus.value === '' || (s.status || 'Active') === filterStatus.value)
+    );
 
     noResults.style.display = filtered.length ? "none" : "block";
 
@@ -511,6 +555,8 @@
         <td>${s.school}</td>
         <td>${s.mobile}</td>
         <td>₹${s.fee}</td>
+        <td style="color:${s.status === 'Inactive' ? 'gray' : 'green'}">${s.status || 'Active'}</td>
+        <td style="color:${s.pendingAmount > 0 ? 'red' : 'green'}">₹${s.pendingAmount || 0}</td>
         <td class="actions">
           <button class="view-btn" onclick='viewStudent(${JSON.stringify(s)})'>View</button>
           <button class="edit-btn" onclick='editStudent(${JSON.stringify(s)})'>Edit</button>
@@ -526,13 +572,14 @@
     document.getElementById("studentModal").style.display = "flex";
     document.getElementById("modalTitle").textContent = "Add Student";
 
-    // ✅ reset fields
     name.value = "";
     mobile.value = "";
     studentClass.value = "";
     school.value = "";
     place.value = "";
     fee.value = "";
+    status.value = "Active";
+    pendingAmount.value = "";
   }
 
   function closeModal() {
@@ -550,7 +597,9 @@
       class: studentClass.value,
       school: school.value,
       place: place.value,
-      fee: parseInt(fee.value)
+      fee: parseInt(fee.value),
+      status: status.value,
+      pendingAmount: parseInt(pendingAmount.value || "0"),
     };
 
     try {
@@ -587,6 +636,8 @@
       <p>Place: ${s.place}</p>
       <p>Mobile: ${s.mobile}</p>
       <p>Monthly Fee: ₹${s.fee}</p>
+      <p>Status: ${s.status || 'Active'}</p>
+      <p>Pending: ₹${s.pendingAmount || 0}</p>
     `;
     flash.style.display = "flex";
   }
@@ -599,6 +650,8 @@
     school.value = s.school;
     place.value = s.place;
     fee.value = s.fee;
+    status.value = s.status || "Active";
+    pendingAmount.value = s.pendingAmount || "0";
     openModal();
     document.getElementById("modalTitle").textContent = "Edit Student";
   }
@@ -609,38 +662,35 @@
       loadStudents();
     }
   }
-   
-  
+
   const profileIcon = document.querySelector('.profile-icon');
   const profileMenu = document.querySelector('.profile-menu');
   const logoutBtn = document.getElementById('logoutBtn');
 
-  // Show/hide profile menu when profile icon clicked
   profileIcon.addEventListener('click', () => {
     profileMenu.style.display = profileMenu.style.display === 'block' ? 'none' : 'block';
   });
 
-  // Logout and redirect to login.html
   logoutBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  localStorage.removeItem('loggedIn');  // Clear login flag on logout
-  window.location.href = "login.html";
-});
+    e.preventDefault();
+    localStorage.removeItem('loggedIn');
+    window.location.href = "login.html";
+  });
 
-
-  // Optional: Hide menu if clicked outside
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.profile-dropdown')) {
       profileMenu.style.display = 'none';
     }
   });
 
-  
-
-  [searchInput, filterSchool, filterPlace].forEach(input => input.addEventListener("input", renderStudents));
+  [searchInput, filterSchool, filterPlace].forEach(input =>
+    input.addEventListener("input", renderStudents)
+  );
+  filterStatus.addEventListener("input", renderStudents);
 
   loadStudents();
 </script>
+
 
 </body>
 </html>

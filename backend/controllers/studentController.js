@@ -38,40 +38,58 @@ const getTotalStudents = async (req, res) => {
   }
 };
 
-// Get Monthly Fee Stats
-const getMonthlyCollected = async (req, res) => {
+// Get Total Fees Collected
+// ✅ Total Fees Collected
+const getTotalFeesCollected = async (req, res) => {
   try {
-    const year = req.query.year;
-    const month = parseInt(req.query.month); // Example: 8 for August
-
-    if (!year || isNaN(month)) {
-      return res.status(400).json({ message: "Year or Month missing" });
-    }
-
-    const students = await Student.find({});
+    const students = await Student.find();
     let totalCollected = 0;
-    let totalPending = 0;
 
-    students.forEach((student) => {
-      const monthlyFee = student.monthlyFee || 0;
-      const yearData = student.feesPaid?.[year];
+    students.forEach(student => {
+      const monthlyFee = student.fee || 0;
+      const paidData = student.feesPaid || {};
 
-      const monthData = yearData?.[month];
-      if (monthData?.paid === true) {
-        totalCollected += monthlyFee;
-      } else {
-        totalPending += monthlyFee;
-      }
+      Object.values(paidData).forEach(yearData => {
+        Object.values(yearData).forEach(monthObj => {
+          if (monthObj?.paid === true) totalCollected += monthlyFee;
+        });
+      });
     });
 
-    res.status(200).json({
-      collected: totalCollected,
-      pending: totalPending,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error });
+    res.json({ totalCollected });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching total fees collected", error: err });
   }
 };
+
+
+
+
+// Pending Fees Total
+// ✅ Total Pending Fees
+const getPendingFees = async (req, res) => {
+  try {
+    const students = await Student.find();
+    let totalPending = 0;
+
+    students.forEach(student => {
+      const monthlyFee = student.fee || 0;
+      const paidData = student.feesPaid || {};
+
+      Object.values(paidData).forEach(yearData => {
+        Object.values(yearData).forEach(monthObj => {
+          if (!monthObj?.paid) totalPending += monthlyFee;
+        });
+      });
+    });
+
+    res.json({ totalPending });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching pending fees", error: err });
+  }
+};
+
+
 
 
 
@@ -181,47 +199,16 @@ const getFeeReport = async (req, res) => {
   }
 };
 
-const jwt = require('jsonwebtoken');
-
-// POST /api/login
-const login = async (req, res) => {
-  try {
-    const { mobile } = req.body;
-
-    // Check if student exists
-    const user = await Student.findOne({ mobile });
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid mobile number' });
-    }
-
-    // Create token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-
-    res.status(200).json({
-      message: 'Login successful',
-      token,
-      user
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Login failed', error });
-  }
-};
-
-
-
-
-
-
 // Export all functions
 module.exports = {
   getDashboardStats,
   getTotalStudents,
-  getMonthlyCollected,
+  getTotalFeesCollected,
+  getPendingFees,
   getAllStudents,
   addStudent,
   updateStudent,
   deleteStudent,
   getFeeReport,
-  updateFeeStatus,
-  login
+  updateFeeStatus
 };

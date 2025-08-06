@@ -155,6 +155,21 @@
         align-items: center;
       }
     }
+
+    .footer {
+  text-align: center;
+  padding: 15px;
+  background-color: #f8f8f8;
+  color: #333;
+  font-size: 14px;
+  margin-top: 40px;
+  border-top: 1px solid #ddd;
+}
+
+.footer p {
+  margin: 0;
+}
+
   </style>
 </head>
 <body>
@@ -217,7 +232,7 @@
     </select>
 
     <select id="filterYear">
-      <option value="">Year</option>
+      <option value="">All Years</option>
       <option>2023</option>
       <option>2024</option>
       <option>2025</option>
@@ -229,6 +244,7 @@
     </select>
 
     <select id="monthSelect">
+      <option value="">All Months</option>
       <option value="Jan">January</option>
       <option value="Feb">February</option>
       <option value="Mar">March</option>
@@ -257,16 +273,41 @@
     </thead>
     <tbody id="reportBody"></tbody>
   </table>
+  <footer class="footer">
+  <p>&copy; 2025 Sudheer Study Centre. All rights reserved. | Designed by Bhuvana Padala</p>
+</footer>
 
-  <script>
+
+<script>
   const API_URL = 'https://elsa-backend.onrender.com/api/students';
+
   if (localStorage.getItem('loggedIn') !== 'true') {
     window.location.href = 'login.html';
   }
 
+  // Set defaults for filters
+  const monthSelect = document.getElementById('monthSelect');
+  const yearSelect = document.getElementById('filterYear');
 
+  // Load last selected filters from localStorage (if available)
+  const savedMonth = localStorage.getItem('selectedMonth');
+  const savedYear = localStorage.getItem('selectedYear');
 
-  const selectedYear = document.getElementById('filterYear').value;
+  if (savedMonth) {
+    monthSelect.value = savedMonth;
+  } else {
+    const currentMonthName = new Date().toLocaleString('default', { month: 'long' });
+    monthSelect.value = currentMonthName;
+    localStorage.setItem('selectedMonth', currentMonthName);
+  }
+
+  if (savedYear) {
+    yearSelect.value = savedYear;
+  } else {
+    const currentYear = new Date().getFullYear().toString();
+    yearSelect.value = currentYear;
+    localStorage.setItem('selectedYear', currentYear);
+  }
 
   let students = [];
 
@@ -282,96 +323,98 @@
   }
 
   function loadReportData() {
-  const tbody = document.getElementById('reportBody');
-  tbody.innerHTML = '';
+    const tbody = document.getElementById('reportBody');
+    tbody.innerHTML = '';
 
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  const filterSchool = document.getElementById('filterSchool').value;
-  const filterPlace = document.getElementById('filterPlace').value;
-  const selectedMonth = document.getElementById('monthSelect').value;
-  const selectedYear = document.getElementById('filterYear').value || new Date().getFullYear().toString();
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const filterSchool = document.getElementById('filterSchool').value;
+    const filterPlace = document.getElementById('filterPlace').value;
+    const selectedMonth = monthSelect.value;
+    const selectedYear = yearSelect.value;
 
-  let totalCollected = 0;
-  let totalPending = 0;
-  let paidCount = 0;
-  let unpaidCount = 0;
+    // Save to localStorage so filters persist after refresh
+    localStorage.setItem('selectedMonth', selectedMonth);
+    localStorage.setItem('selectedYear', selectedYear);
 
-  students.forEach(s => {
-    const monthNumber = new Date(`${selectedMonth} 1, ${selectedYear}`).getMonth() + 1;
-const paid = s.feesPaid?.[selectedYear]?.[monthNumber]?.paid === true;
+    let totalCollected = 0;
+    let totalPending = 0;
+    let paidCount = 0;
+    let unpaidCount = 0;
 
+    students.forEach(s => {
+      const monthNumber = new Date(`${selectedMonth} 1, ${selectedYear}`).getMonth() + 1;
+      const paid = s.feesPaid?.[selectedYear]?.[monthNumber]?.paid === true;
 
-    const matchesSearch = s.name.toLowerCase().includes(search);
-    const matchesSchool = !filterSchool || s.school === filterSchool;
-    const matchesPlace = !filterPlace || s.place === filterPlace;
+      const matchesSearch = s.name.toLowerCase().includes(search);
+      const matchesSchool = !filterSchool || s.school === filterSchool;
+      const matchesPlace = !filterPlace || s.place === filterPlace;
 
-    if (matchesSearch && matchesSchool && matchesPlace) {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${s.name}</td>
-        <td>${s.school}</td>
-        <td>${s.place}</td>
-        <td>₹${s.fee}</td>
-        <td class="${paid ? 'paid' : 'unpaid'}">${paid ? 'Paid' : 'Unpaid'}</td>
-        <td>${paid ? '₹0' : `₹${s.fee}`}</td>
-      `;
-      tbody.appendChild(row);
+      if (matchesSearch && matchesSchool && matchesPlace) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${s.name}</td>
+          <td>${s.school}</td>
+          <td>${s.place}</td>
+          <td>₹${s.fee}</td>
+          <td class="${paid ? 'paid' : 'unpaid'}">${paid ? 'Paid' : 'Unpaid'}</td>
+          <td>${paid ? '₹0' : `₹${s.fee}`}</td>
+        `;
+        tbody.appendChild(row);
 
-      if (paid) {
-        totalCollected += s.fee;
-        paidCount++;
-      } else {
-        totalPending += s.fee;
-        unpaidCount++;
+        if (paid) {
+          totalCollected += s.fee;
+          paidCount++;
+        } else {
+          totalPending += s.fee;
+          unpaidCount++;
+        }
       }
-    }
-  });
+    });
 
-  document.getElementById('totalCollected').textContent = `₹${totalCollected}`;
-  document.getElementById('totalPending').textContent = `₹${totalPending}`;
-  document.getElementById('paidCount').textContent = paidCount;
-  document.getElementById('unpaidCount').textContent = unpaidCount;
-}
-
+    document.getElementById('totalCollected').textContent = `₹${totalCollected}`;
+    document.getElementById('totalPending').textContent = `₹${totalPending}`;
+    document.getElementById('paidCount').textContent = paidCount;
+    document.getElementById('unpaidCount').textContent = unpaidCount;
+  }
 
   // Event listeners
   document.getElementById('searchInput').addEventListener('input', loadReportData);
   document.getElementById('filterSchool').addEventListener('change', loadReportData);
   document.getElementById('filterPlace').addEventListener('change', loadReportData);
-  document.getElementById('filterYear').addEventListener('change', loadReportData);
-  document.getElementById('monthSelect').addEventListener('change', loadReportData);
+  document.getElementById('filterYear').addEventListener('change', () => {
+    localStorage.setItem('selectedYear', yearSelect.value);
+    loadReportData();
+  });
+  document.getElementById('monthSelect').addEventListener('change', () => {
+    localStorage.setItem('selectedMonth', monthSelect.value);
+    loadReportData();
+  });
 
   // Initial load
   loadStudents();
 
-  
+  // Profile menu & logout
   const profileIcon = document.querySelector('.profile-icon');
   const profileMenu = document.querySelector('.profile-menu');
   const logoutBtn = document.getElementById('logoutBtn');
 
-  // Show/hide profile menu when profile icon clicked
   profileIcon.addEventListener('click', () => {
     profileMenu.style.display = profileMenu.style.display === 'block' ? 'none' : 'block';
   });
 
-  // Logout and redirect to login.html
   logoutBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  localStorage.removeItem('loggedIn'); 
-  window.location.href = "login.html";
-});
+    e.preventDefault();
+    localStorage.removeItem('loggedIn');
+    window.location.href = "login.html";
+  });
 
-
-  // Optional: Hide menu if clicked outside
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.profile-dropdown')) {
       profileMenu.style.display = 'none';
     }
   });
-  
-  
-
 </script>
+
 
 </body>
 </html>

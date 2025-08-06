@@ -140,6 +140,21 @@
         grid-template-columns: repeat(3, 1fr);
       }
     }
+
+    .footer {
+  text-align: center;
+  padding: 15px;
+  background-color: #f8f8f8;
+  color: #333;
+  font-size: 14px;
+  margin-top: 40px;
+  border-top: 1px solid #ddd;
+}
+
+.footer p {
+  margin: 0;
+}
+
   </style>
 </head>
 <body>
@@ -198,6 +213,11 @@
 
   <div id="studentsContainer"></div>
   <p class="no-results" id="noResults" style="display: none;">No students found.</p>
+
+  <footer class="footer">
+  <p>&copy; 2025 Sudheer Study Centre. All rights reserved. | Designed by Bhuvana Padala</p>
+</footer>
+
 
   <script>
   const API_URL = "https://elsa-backend.onrender.com/api/students";

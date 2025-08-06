@@ -7,6 +7,8 @@ const cors = require('cors');
 const listEndpoints = require('express-list-endpoints');
 const connectDB = require('./config/db');
 const studentRoutes = require('./routes/studentRoutes');
+const authRoutes = require('./routes/authRoutes');
+
 
 
 dotenv.config();
@@ -28,6 +30,7 @@ app.get('/', (req, res) => {
 
 // API Routes
 app.use('/api/students', studentRoutes);
+app.use('/api/auth', authRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

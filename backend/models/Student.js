@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// Monthly fee status schema
+// 📌 Monthly fee status schema
 const feeStatusSchema = new mongoose.Schema({
   paid: {
     type: Boolean,
@@ -12,7 +12,7 @@ const feeStatusSchema = new mongoose.Schema({
   }
 }, { _id: false });
 
-// Main Student Schema
+// 📌 Student schema
 const studentSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -42,8 +42,8 @@ const studentSchema = new mongoose.Schema({
     type: String,
     default: ""
   },
-
-  // Structure: { 2025: { 1: { paid, date }, 2: {...}, ... }, 2026: {...} }
+  status: { type: String, enum: ['Active', 'Inactive'], default: 'Active' },
+  pendingAmount: { type: Number, default: 0 },
   feesPaid: {
     type: Map,
     of: {
@@ -52,11 +52,15 @@ const studentSchema = new mongoose.Schema({
     },
     default: {}
   },
-
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
 
-module.exports = mongoose.model('Student', studentSchema);
+
+
+// ✅ Named exports for both models
+const Student = mongoose.model('Student', studentSchema);
+
+module.exports = { Student };

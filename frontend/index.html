@@ -57,6 +57,30 @@ h1 {
   color: #1571cc;
 }
 
+.filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: center;
+      margin: 20px auto;
+      padding: 10px;
+      background-color: #f0f4f8;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      max-width: 500px;
+    }
+
+    .filters input,
+    .filters select {
+      padding: 10px 15px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      flex: 1;
+      min-width: 150px;
+      max-width: 250px;
+    }
+
 .flashcards {
   display: flex;
   flex-wrap: wrap;
@@ -167,6 +191,21 @@ h1 {
   }
 }
 
+.footer {
+  text-align: center;
+  padding: 15px;
+  background-color: #f8f8f8;
+  color: #333;
+  font-size: 14px;
+  margin-top: 40px;
+  border-top: 1px solid #ddd;
+}
+
+.footer p {
+  margin: 0;
+}
+
+
   </style>
 </head>
 
@@ -196,13 +235,43 @@ h1 {
   </div>
 
   <h1>Dashboard</h1>
+  <div class="filters">
+  <select id="dashMonth">
+      <option>All Years</option>
+      <option>January</option>
+      <option>February</option>
+      <option>March</option>
+      <option>April</option>
+      <option>May</option>
+      <option>June</option>
+      <option>July</option>
+      <option>August</option>
+      <option>September</option>
+      <option>October</option>
+      <option>November</option>
+      <option>December</option>
+</select>
 
+<select id="dashYear">
+  <option>All years</option>
+  <option>2023</option>
+  <option>2024</option>
+  <option>2025</option>
+  <option>2026</option>
+  <option>2027</option>
+  <option>2028</option>
+  <option>2029</option>
+  <option>2030</option>
+</select>
+</div>
   <div class="flashcards">
     <div class="card" onclick="goTo('students.html')">
       <span class="material-icons">groups</span>
       <h3>Total Students</h3>
       <p id="totalStudents">--</p>
     </div>
+
+
 
     <div class="card" onclick="goTo('fees.html')">
       <span class="material-icons">pending_actions</span>
@@ -217,32 +286,55 @@ h1 {
     </div>
   </div>
 
+  <footer class="footer">
+  <p>&copy; 2025 Sudheer Study Centre. All rights reserved. | Designed by Bhuvana Padala</p>
+</footer>
+
+
   <script>
     const API_URL = 'https://elsa-backend.onrender.com/api/students';
     if (localStorage.getItem('loggedIn') !== 'true') {
-    window.location.href = 'login.html';  // Login kakapothe login page ki redirect avvadam
+    window.location.href = 'login.html';  
   }
-  
-async function updateDashboardCards() {
+
+
+// Get current month & year
+const today = new Date();
+const currentMonthName = today.toLocaleString('default', { month: 'long' });
+const currentYear = today.getFullYear().toString();
+
+// Month list
+const monthNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+// Update Dashboard Cards
+async function updateDashboardCards(selectedMonthName = currentMonthName, selectedYear = currentYear) {
   try {
     const res = await fetch(API_URL);
     const students = await res.json();
 
-    const now = new Date();
-    const monthNumber = now.getMonth() + 1; // 1-12
-    const year = now.getFullYear().toString();
+    const monthIndex = monthNames.indexOf(selectedMonthName);
+    const monthNumber = monthIndex + 1;
 
     let totalCollected = 0;
     let totalPending = 0;
 
-    students.forEach(s => {
-      const monthlyFee = s.fee || 0;
-      const paid = s.feesPaid?.[year]?.[monthNumber]?.paid === true;
+    students.forEach(student => {
+      const monthlyFee = student.fee || 0;
+      const yearlyData = student.feesPaid?.[selectedYear];
 
-      if (paid) {
-        totalCollected += monthlyFee;
+      if (selectedMonthName === "All") {
+        for (let i = 1; i <= 12; i++) {
+          const paid = yearlyData?.[i]?.paid === true;
+          if (paid) totalCollected += monthlyFee;
+          else totalPending += monthlyFee;
+        }
       } else {
-        totalPending += monthlyFee;
+        const paid = yearlyData?.[monthNumber]?.paid === true;
+        if (paid) totalCollected += monthlyFee;
+        else totalPending += monthlyFee;
       }
     });
 
@@ -253,6 +345,7 @@ async function updateDashboardCards() {
   }
 }
 
+// Load Total Students
 document.addEventListener("DOMContentLoaded", () => {
   fetch('https://elsa-backend.onrender.com/api/students/count')
     .then(res => res.json())
@@ -264,39 +357,64 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+// Profile Menu
+const profileIcon = document.querySelector('.profile-icon');
+const profileMenu = document.querySelector('.profile-menu');
+const logoutBtn = document.getElementById('logoutBtn');
 
-  const profileIcon = document.querySelector('.profile-icon');
-  const profileMenu = document.querySelector('.profile-menu');
-  const logoutBtn = document.getElementById('logoutBtn');
+profileIcon.addEventListener('click', () => {
+  profileMenu.style.display = profileMenu.style.display === 'block' ? 'none' : 'block';
+});
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.profile-dropdown')) {
+    profileMenu.style.display = 'none';
+  }
+});
 
-  // Show/hide profile menu when profile icon clicked
-  profileIcon.addEventListener('click', () => {
-    profileMenu.style.display = profileMenu.style.display === 'block' ? 'none' : 'block';
-  });
-
-
-  // Optional: Hide menu if clicked outside
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.profile-dropdown')) {
-      profileMenu.style.display = 'none';
-    }
-  });
-
-  logoutBtn.addEventListener('click', (e) => {
+// Logout
+logoutBtn.addEventListener('click', (e) => {
   e.preventDefault();
-  localStorage.removeItem('loggedIn'); // Clear login flag
+  localStorage.removeItem('loggedIn');
+  localStorage.removeItem("dashMonth");
+  localStorage.removeItem("dashYear");
   window.location.href = "login.html";
 });
 
-  
-  
+// Dashboard Filters
+const dashMonth = document.getElementById("dashMonth");
+const dashYear = document.getElementById("dashYear");
+
+dashMonth.addEventListener("change", () => {
+  const month = dashMonth.value;
+  const year = dashYear.value;
+  localStorage.setItem("dashMonth", month);
+  updateDashboardCards(month, year);
+});
+
+dashYear.addEventListener("change", () => {
+  const month = dashMonth.value;
+  const year = dashYear.value;
+  localStorage.setItem("dashYear", year);
+  updateDashboardCards(month, year);
+});
+
+// On Load: set default or saved values and mark selected in dropdown
+window.addEventListener("DOMContentLoaded", () => {
+  const savedMonth = localStorage.getItem("dashMonth") || currentMonthName;
+  const savedYear = localStorage.getItem("dashYear") || currentYear;
+
+  Array.from(dashMonth.options).forEach(opt => {
+    opt.selected = opt.value === savedMonth;
+  });
+
+  Array.from(dashYear.options).forEach(opt => {
+    opt.selected = opt.value === savedYear;
+  });
+
+  updateDashboardCards(savedMonth, savedYear);
+});
 
 
-updateDashboardCards();
-
-    function goTo(page) {
-      window.location.href = page;
-    }
   </script>
 </body>
 </html>
