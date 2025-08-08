@@ -89,12 +89,6 @@ const getPendingFees = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
 // Get all students
 const getAllStudents = async (req, res) => {
   try {

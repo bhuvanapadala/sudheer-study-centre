@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// 📌 Monthly fee status schema
 const feeStatusSchema = new mongoose.Schema({
   paid: {
     type: Boolean,
@@ -12,7 +11,6 @@ const feeStatusSchema = new mongoose.Schema({
   }
 }, { _id: false });
 
-// 📌 Student schema
 const studentSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -58,9 +56,4 @@ const studentSchema = new mongoose.Schema({
   }
 });
 
-
-
-// ✅ Named exports for both models
-const Student = mongoose.model('Student', studentSchema);
-
-module.exports = { Student };
+module.exports = mongoose.model('Student', studentSchema);
