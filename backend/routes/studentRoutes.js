@@ -9,7 +9,7 @@ const {
   getPendingFees,
   getAllStudents,
   addStudent,
-  updateStudent,
+  editStudent,
   deleteStudent,
   getFeeReport,
   updateFeeStatus
@@ -26,7 +26,7 @@ router.get('/total-pending', getPendingFees);
 // 👨‍🎓 Student CRUD routes
 router.get('/', getAllStudents);
 router.post('/', addStudent);
-router.put('/:id', updateStudent);
+router.put('/:id', editStudent);
 router.delete('/:id', deleteStudent);
 
 // 📅 Fees report & update

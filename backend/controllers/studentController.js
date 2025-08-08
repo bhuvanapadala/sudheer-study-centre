@@ -111,7 +111,7 @@ const addStudent = async (req, res) => {
 };
 
 // Update student
-const updateStudent = async (req, res) => {
+const editStudent = async (req, res) => {
   try {
     const updated = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(updated);
@@ -201,7 +201,7 @@ module.exports = {
   getPendingFees,
   getAllStudents,
   addStudent,
-  updateStudent,
+  editStudent,
   deleteStudent,
   getFeeReport,
   updateFeeStatus
